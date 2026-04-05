@@ -5,80 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        body {
+        * {
             margin: 0;
-            font-family: Arial;
-            background: linear-gradient(135deg, #141e30, #243b55);
-            color: white;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            background: linear-gradient(135deg, #1d2b64, #f8cdda);
         }
 
-        .container {
-            text-align: center;
-            background: rgba(0,0,0,0.6);
+        .card {
+            backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.5);
             padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border-radius: 20px;
             width: 90%;
             max-width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
         }
 
         h1 {
+            color: white;
             margin-bottom: 20px;
+            font-size: 26px;
         }
 
         input {
             width: 100%;
             padding: 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: none;
             margin-bottom: 15px;
-            font-size: 16px;
+            font-size: 15px;
+            outline: none;
         }
 
         button {
             width: 100%;
             padding: 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: none;
-            background: #e50914;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
             color: white;
             font-size: 16px;
             cursor: pointer;
+            transition: 0.3s;
         }
 
         button:hover {
-            background: #ff1f1f;
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255,75,43,0.5);
         }
 
         .msg {
             margin-top: 15px;
             font-size: 14px;
-            color: #ccc;
+            color: #ddd;
         }
 
         .loader {
             display: none;
             margin-top: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="card">
     <h1>AIPPS 🎬</h1>
 
     <form method="POST" onsubmit="showLoader()">
         <input type="text" name="movie" placeholder="Enter movie name" required>
-        <button type="submit">Post to Instagram</button>
+        <button type="submit">🚀 Post to Instagram</button>
     </form>
 
     <div class="loader" id="loader">⏳ Posting...</div>
-
     <div class="msg">{{ message }}</div>
 </div>
 
