@@ -98,15 +98,15 @@ def add_overlay():
     draw = ImageDraw.Draw(overlay)
 
     rect_height = int(height * 0.10)
-    draw.rectangle(
-        [(0, height - rect_height), (width, height)],
-        fill=(0, 0, 0, 180)
-    )
+    #draw.rectangle(
+    #    [(0, height - rect_height), (width, height)],
+    #  fill=(0, 0, 0, 180)
+    #  )
 
     text = "Posted by AIPPS"
 
     try:
-        font = ImageFont.truetype("arial.ttf", int(height * 0.05))
+        font = ImageFont.truetype("arial.ttf", int(height * 0.10))
     except:
         font = ImageFont.load_default()
 
