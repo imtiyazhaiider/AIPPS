@@ -43,18 +43,21 @@ def run_aipps(movie_name):
 @app.route("/", methods=["GET", "POST"])
 def home():
     message = ""
+    status = ""
 
     if request.method == "POST":
         movie_name = request.form.get("movie")
 
-        # run in background
-        thread = threading.Thread(target=run_aipps, args=(movie_name,))
-        thread.start()
+        result = run_aipps(movie_name)
 
-        message = "⏳ Processing... check Instagram shortly"
+        if "successfully" in result:
+            status = "success"
+        else:
+            status = "error"
 
-    return render_template("index.html", message=message)
+        message = result
 
+    return render_template("index.html", message=message, status=status)
 
 import os
 

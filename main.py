@@ -106,7 +106,7 @@ def add_overlay():
     text = "Posted by AIPPS"
 
     try:
-        font = ImageFont.truetype("arial.ttf", int(height * 0.03))
+        font = ImageFont.truetype("arial.ttf", int(height * 0.05))
     except:
         font = ImageFont.load_default()
 
