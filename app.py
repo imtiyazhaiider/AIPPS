@@ -102,19 +102,38 @@ def save_movie(title):
     conn.close()
 
 # 🔐 LOGIN ROUTE
-@app.route("/login", methods=["GET", "POST"])
-def login():
+@app.route("/", methods=["GET", "POST"])
+def home():
+    if "user" not in session:
+        return redirect("/login")
+
+    message = ""
+    status = ""
+
     if request.method == "POST":
-        user = request.form.get("username").strip()
-        pwd = request.form.get("password").strip()
+        movie_name = request.form.get("movie")
 
-        if user == USERNAME and pwd == PASSWORD:
-            session["user"] = user
-            return redirect("/")
+        print("BUTTON CLICKED")  # 👈 debug
+
+        result = run_aipps(movie_name)   # ✅ DIRECT CALL (NO THREAD)
+
+        print("RESULT:", result)
+
+        if "successfully" in result:
+            status = "success"
         else:
-            return render_template("login.html", error="Invalid credentials")
+            status = "error"
 
-    return render_template("login.html")
+        message = result
+
+    movies = get_movies()
+
+    return render_template(
+        "index.html",
+        message=message,
+        status=status,
+        movies=movies
+    )
 
 
 # 🚪 LOGOUT
