@@ -61,7 +61,10 @@ def get_movies():
 
 # 🚀 MAIN LOGIC
 def run_aipps(movie_name):
+    print("STARTED PROCESS")
+
     movie = get_movie_data(movie_name)
+    print("Movie fetched:", movie)
 
     if not movie:
         return "❌ Movie not found"
@@ -69,19 +72,34 @@ def run_aipps(movie_name):
     if not download_poster(movie["title"], movie["year"]):
         return "❌ Poster failed"
 
+    print("Poster downloaded")
+
     make_square()
     add_overlay()
 
     caption = create_caption(movie)
+    print("Caption created")
 
     try:
+        print("Trying to post...")
         post_to_instagram(caption, movie["title"])
-        save_movie(movie["title"])   # ✅ SAVE TO DB
+        print("POST SUCCESS")
+
+        save_movie(movie["title"])
         return "✅ Posted successfully!"
     except Exception as e:
-        print(e)
-        return "❌ Error posting"
+        print("ERROR:", e)
+        return f"❌ Error: {e}"
 
+def save_movie(title):
+    print("Saving movie:", title)   # 👈 ADD THIS
+
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+
+    c.execute("INSERT INTO movies (title) VALUES (?)", (title,))
+    conn.commit()
+    conn.close()
 
 # 🔐 LOGIN ROUTE
 @app.route("/login", methods=["GET", "POST"])
