@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request
-import threading
+from flask import Flask, render_template, request, redirect, session
+import os
 
-# import your existing functions
 from main import (
     get_movie_data,
     download_poster,
@@ -13,6 +12,12 @@ from main import (
 )
 
 app = Flask(__name__)
+app.secret_key = "aipps_secret"
+
+
+# 🔐 SIMPLE LOGIN (change credentials here)
+USERNAME = "admin"
+PASSWORD = "1234"
 
 
 def run_aipps(movie_name):
@@ -35,13 +40,39 @@ def run_aipps(movie_name):
     try:
         post_to_instagram(caption, movie["title"])
         return "✅ Posted successfully!"
-    except Exception as e:
-        print(e)
+    except:
         return "❌ Error posting"
 
 
+# 🔐 LOGIN ROUTE
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        user = request.form.get("username")
+        pwd = request.form.get("password")
+
+        if user == USERNAME and pwd == PASSWORD:
+            session["user"] = user
+            return redirect("/")
+        else:
+            return render_template("login.html", error="Invalid credentials")
+
+    return render_template("login.html")
+
+
+# 🚪 LOGOUT
+@app.route("/logout")
+def logout():
+    session.pop("user", None)
+    return redirect("/login")
+
+
+# 🏠 MAIN APP
 @app.route("/", methods=["GET", "POST"])
 def home():
+    if "user" not in session:
+        return redirect("/login")
+
     message = ""
     status = ""
 
@@ -57,9 +88,14 @@ def home():
 
         message = result
 
-    return render_template("index.html", message=message, status=status)
+    # 📄 READ POSTED MOVIES
+    movies = []
+    if os.path.exists("posted.txt"):
+        with open("posted.txt", "r") as f:
+            movies = f.read().splitlines()[::-1]  # latest first
 
-import os
+    return render_template("index.html", message=message, status=status, movies=movies)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
