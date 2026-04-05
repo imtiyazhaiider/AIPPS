@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
 import os
+import sqlite3
 
 from main import (
     get_movie_data,
@@ -7,27 +8,63 @@ from main import (
     make_square,
     add_overlay,
     create_caption,
-    is_already_posted,
     post_to_instagram
 )
 
 app = Flask(__name__)
 app.secret_key = "aipps_secret"
 
-
-# 🔐 SIMPLE LOGIN (change credentials here)
+# 🔐 LOGIN
 USERNAME = "admin"
 PASSWORD = "1234"
 
+DB = "movies.db"
 
+
+# 🧠 INIT DATABASE
+def init_db():
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS movies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+# 💾 SAVE MOVIE
+def save_movie(title):
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+
+    c.execute("INSERT INTO movies (title) VALUES (?)", (title,))
+    conn.commit()
+    conn.close()
+
+
+# 📄 GET MOVIES
+def get_movies():
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+
+    c.execute("SELECT title FROM movies ORDER BY id DESC")
+    movies = [row[0] for row in c.fetchall()]
+
+    conn.close()
+    return movies
+
+
+# 🚀 MAIN LOGIC
 def run_aipps(movie_name):
     movie = get_movie_data(movie_name)
 
     if not movie:
         return "❌ Movie not found"
-
-    if is_already_posted(movie["title"]):
-        return "⚠️ Already posted"
 
     if not download_poster(movie["title"], movie["year"]):
         return "❌ Poster failed"
@@ -39,8 +76,10 @@ def run_aipps(movie_name):
 
     try:
         post_to_instagram(caption, movie["title"])
+        save_movie(movie["title"])   # ✅ SAVE TO DB
         return "✅ Posted successfully!"
-    except:
+    except Exception as e:
+        print(e)
         return "❌ Error posting"
 
 
@@ -48,8 +87,8 @@ def run_aipps(movie_name):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        user = request.form.get("username")
-        pwd = request.form.get("password")
+        user = request.form.get("username").strip()
+        pwd = request.form.get("password").strip()
 
         if user == USERNAME and pwd == PASSWORD:
             session["user"] = user
@@ -67,7 +106,7 @@ def logout():
     return redirect("/login")
 
 
-# 🏠 MAIN APP
+# 🏠 HOME
 @app.route("/", methods=["GET", "POST"])
 def home():
     if "user" not in session:
@@ -78,7 +117,6 @@ def home():
 
     if request.method == "POST":
         movie_name = request.form.get("movie")
-
         result = run_aipps(movie_name)
 
         if "successfully" in result:
@@ -88,15 +126,18 @@ def home():
 
         message = result
 
-    # 📄 READ POSTED MOVIES
-    movies = []
-    if os.path.exists("posted.txt"):
-        with open("posted.txt", "r") as f:
-            movies = f.read().splitlines()[::-1]  # latest first
+    movies = get_movies()
 
-    return render_template("index.html", message=message, status=status, movies=movies)
+    return render_template(
+        "index.html",
+        message=message,
+        status=status,
+        movies=movies
+    )
 
 
+# 🚀 START
 if __name__ == "__main__":
+    init_db()
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)

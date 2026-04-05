@@ -21,13 +21,11 @@
             color: white;
         }
 
-        /* BACKGROUND IMAGE */
         .bg {
             position: fixed;
             width: 100%;
             height: 100%;
-            background: #000;
-            z-index: -2;
+            z-index: -1;
         }
 
         .bg img {
@@ -37,98 +35,97 @@
             filter: blur(25px) brightness(0.4);
         }
 
-        /* CARD */
         .card {
-            backdrop-filter: blur(25px);
-            background: rgba(0,0,0,0.5);
-            padding: 30px;
+            background: rgba(0,0,0,0.6);
+            padding: 25px;
             border-radius: 20px;
             width: 90%;
             max-width: 350px;
             text-align: center;
             box-shadow: 0 10px 60px rgba(0,0,0,0.8);
-            animation: fadeIn 1s ease;
-        }
-
-        @keyframes fadeIn {
-            from {opacity: 0; transform: scale(0.9);}
-            to {opacity: 1; transform: scale(1);}
         }
 
         h1 {
-            margin-bottom: 20px;
-            font-size: 28px;
+            margin-bottom: 15px;
         }
 
         input {
             width: 100%;
             padding: 12px;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none;
-            margin-bottom: 15px;
-            font-size: 15px;
+            margin-bottom: 10px;
         }
 
         button {
             width: 100%;
             padding: 12px;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none;
-            background: linear-gradient(45deg, #ff0000, #ff4d4d);
+            background: linear-gradient(45deg, red, darkred);
             color: white;
             font-size: 16px;
             cursor: pointer;
-            transition: 0.3s;
         }
 
         button:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(255,0,0,0.6);
-        }
-
-        /* POSTER PREVIEW */
-        .preview {
-            margin-top: 15px;
-            display: none;
         }
 
         .preview img {
             width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.7);
+            border-radius: 10px;
+            margin-top: 10px;
         }
 
-        /* LOADER */
         .loader {
             margin-top: 10px;
             display: none;
         }
 
-        /* POPUP */
         .popup {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             background: #00c853;
-            padding: 12px 25px;
+            padding: 10px 20px;
             border-radius: 10px;
-            font-size: 14px;
             display: none;
-            animation: pop 0.4s ease;
         }
 
-        @keyframes pop {
-            from {transform: translateY(50px); opacity: 0;}
-            to {transform: translateY(0); opacity: 1;}
+        .movie-list {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.9);
+            padding: 10px;
         }
 
+        .movie-list ul {
+            list-style: none;
+            text-align: center;
+        }
+
+        .logout {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: red;
+            padding: 5px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
 
-<!-- BACKGROUND -->
+<a href="/logout" class="logout">Logout</a>
+
 <div class="bg">
-    <img id="bgImage" src="">
+    <img id="bgImage">
 </div>
 
 <div class="card">
@@ -136,7 +133,7 @@
 
     <form method="POST" onsubmit="showLoader()">
         <input type="text" name="movie" id="movieInput" placeholder="Enter movie name" required>
-        <button type="submit">🚀 Post</button>
+        <button>🚀 Post</button>
     </form>
 
     <div class="loader" id="loader">⏳ Posting...</div>
@@ -146,16 +143,16 @@
     </div>
 </div>
 
- <div style="position:fixed; bottom:0; width:100%; max-height:200px; overflow:auto; background:rgba(0,0,0,0.85); padding:10px; color:white;">
+<div class="popup" id="popup">✅ Posted Successfully</div>
+
+<div class="movie-list">
     <h3 style="text-align:center;">🎬 Posted Movies</h3>
-    <ul style="list-style:none; padding:0; text-align:center;">
+    <ul>
         {% for movie in movies %}
-            <li style="margin:5px 0;">{{ movie }}</li>
+            <li>{{ movie }}</li>
         {% endfor %}
     </ul>
 </div>
-
-<div class="popup" id="popup">✅ Posted Successfully</div>
 
 <script>
 function showLoader() {
@@ -167,12 +164,11 @@ function showLoader() {
     setTimeout(() => {
         let popup = document.getElementById("popup");
         popup.style.display = "block";
-
         setTimeout(() => popup.style.display = "none", 3000);
     }, 500);
 {% endif %}
 
-/* LIVE PREVIEW + BACKGROUND */
+/* PREVIEW + BACKGROUND */
 document.getElementById("movieInput").addEventListener("input", function() {
     let name = this.value;
 
@@ -189,7 +185,6 @@ document.getElementById("movieInput").addEventListener("input", function() {
 
             document.getElementById("posterPreview").src = poster;
             document.getElementById("preview").style.display = "block";
-
             document.getElementById("bgImage").src = backdrop;
         }
     });
