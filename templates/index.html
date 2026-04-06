@@ -189,6 +189,14 @@ document.getElementById("movieInput").addEventListener("input", function() {
         }
     });
 });
+
+<div class="movie-list">
+    <ul>
+        {% for movie in movies %}
+            <li>{{ movie }}</li>
+        {% endfor %}
+    </ul>
+</div>
 </script>
 
 </body>
